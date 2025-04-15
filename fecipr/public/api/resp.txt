@@ -1,0 +1,6 @@
+{
+    "textEnc" : "",
+    "textDecr":"",
+    "key": "",
+    "textBreak":""
+}
