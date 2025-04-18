@@ -18,8 +18,8 @@ export default function LabTabs({ onSubmit }) {
   return (
     <Box 
       sx={{ 
-        width: '45%', 
-        height: '50%', 
+        width: 'auto%', 
+        height: 'auto', 
         position: 'absolute',
         top: 20, 
         left: 20, 

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, Typography, TextareaAutosize } from '@mui/material';
+import { Box, TextField, Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { respon } from '../services/httpClient';
 import { Loader } from './Loader/Loader';
-
 
 export default function BreakForm({ onSubmit }) {
   const [inputValue, setInputValue] = useState('');
@@ -34,91 +33,121 @@ export default function BreakForm({ onSubmit }) {
     setErrorLoadingMessage('');
     setResult(null);
 
-    respon('/api/break', formPayload) 
+    respon('/api/break', formPayload)
       .then((data) => setResult(data))
       .catch(() => setErrorLoadingMessage('Try again later'))
       .finally(() => setLoading(false));
   };
 
   function reload() {
-    setUpdateat(new Date())
-    setErrorLoadingMessage('')
+    setUpdateat(new Date());
+    setErrorLoadingMessage('');
   }
 
   return (
     <Box
       component="form"
       onSubmit={handleSubmit}
-      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
+      sx={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: 3, 
+        width: '100%', 
+        maxWidth: '100%',
+        p: 1
+      }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+      {/* Рядок вводу тексту */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography sx={{ minWidth: '100px' }}>Enter text</Typography>
         <TextField
-          variant="outlined"
+          id="outlined-textarea"
+          label="Enter text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           required
+          multiline
+          fullWidth
           sx={{ 
-            width: '300px',
+            minWidth: '100px',
             '& .MuiOutlinedInput-root': {
               '& fieldset': { borderColor: '#9e9e9e' },
-              '& input': { color: 'white' },
             },
           }}
         />
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography sx={{ minWidth: '100px' }}>Add file</Typography>
-        <Button variant="contained" component="label" sx={{ width: '300px' }}>
+        <Button 
+          variant="contained" 
+          component="label" 
+          fullWidth
+          sx={{ minWidth: '100px' }}
+        >
           Browse
           <input type="file" hidden onChange={handleFileChange} />
         </Button>
       </Box>
 
-      <Button 
-        variant="contained" 
-        endIcon={<SendIcon />}
-        type="submit"
-        sx={{ width: '420px' }}
-      >
-        Break Encryption
-      </Button>
-
-      {selectedFile && (
-        <Typography variant="body2">Chosen file: {selectedFile.name}</Typography>
-      )}
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Button 
+          variant="contained" 
+          endIcon={<SendIcon />}
+          type="submit"
+          fullWidth
+          sx={{ minWidth: '100px' }}
+        >
+          Break Encryption
+        </Button>
+        {selectedFile && (
+          <Typography variant="body2">
+            Chosen file: {selectedFile.name}
+          </Typography>
+        )}
+      </Box>
 
       {loading && (
-        <Loader />
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Loader />
+        </Box>
       )}
 
       {!loading && result && (
-        <TextareaAutosize
-        maxRows={25}
+        <TextField
+          id="result-field"
+          label="Result"
           aria-label="Result"
           placeholder="Result will appear here"
-          style={{ width: 400, padding: '10px' }}
           value={result}
+          multiline
           readOnly
+          fullWidth
+          sx={{ 
+            mt: 2,
+            minWidth: '100px',
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': { borderColor: '#9e9e9e' },
+              '& textarea': { color: 'white' },
+            },
+          }}
         />
       )}
 
-
       {!loading && errorLoadingMessage && (
         <Box sx={{ mt: 2 }}>
-        <Typography color="error">{errorLoadingMessage}</Typography>
-        <Button 
-          variant="outlined" 
-          onClick={reload}
-          sx={{ mt: 1 }}
-        >
-          Retry
-        </Button>
-      </Box>
+          <Typography color="error">
+            {errorLoadingMessage}
+          </Typography>
+          <Button 
+            variant="outlined" 
+            onClick={reload}
+            sx={{ mt: 1 }}
+          >
+            Retry
+          </Button>
+        </Box>
       )}
-
-      
     </Box>
   );
 }

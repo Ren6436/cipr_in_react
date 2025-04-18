@@ -7,7 +7,6 @@ export const App = () => {
 
   const handleSubmit = (data) => {
     console.log('Form submitted:', data);
-    // Тут можна додати логіку відправки на сервер
   };
 
   
