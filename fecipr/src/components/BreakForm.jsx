@@ -57,7 +57,6 @@ export default function BreakForm({ onSubmit }) {
         p: 1
       }}
     >
-      {/* Рядок вводу тексту */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography sx={{ minWidth: '100px' }}>Enter text</Typography>
         <TextField
@@ -132,6 +131,7 @@ export default function BreakForm({ onSubmit }) {
             },
           }}
         />
+        
       )}
 
       {!loading && errorLoadingMessage && (

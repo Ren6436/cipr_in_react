@@ -1,85 +1,171 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, TextField, Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import { respon } from '../services/httpClient';
+import { Loader } from './Loader/Loader';
 
 export default function DecryptForm({ onSubmit }) {
-  const [inputValue, setInputValue] = React.useState('');
   const [key, setKey] = React.useState('');
-  const [selectedFile, setSelectedFile] = React.useState(null);
+  const [inputValue, setInputValue] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [errorLoadingMessage, setErrorLoadingMessage] = useState('');
+  const [update, setUpdateat] = useState(new Date());
 
   const handleFileChange = (event) => {
-    setSelectedFile(event.target.files[0]);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    onSubmit({
-      type: 'decrypt',
-      text: inputValue,
-      key: key,
-      file: selectedFile
-    });
-  };
+      setSelectedFile(event.target.files[0]);
+    };
+  
+    const handleSubmit = (event) => {
+      event.preventDefault();
+  
+      const formPayload = {
+        text: inputValue,
+        file: selectedFile
+      };
+  
+      onSubmit({
+        type: 'decrypt',
+        ...formPayload
+      });
+  
+      setLoading(true);
+      setErrorLoadingMessage('');
+      setResult(null);
+  
+      respon('/api/decrypt', formPayload)
+        .then((data) => setResult(data))
+        .catch(() => setErrorLoadingMessage('Try again later'))
+        .finally(() => setLoading(false));
+    };
+  
+    function reload() {
+      setUpdateat(new Date());
+      setErrorLoadingMessage('');
+    }
 
   return (
     <Box
-      component="form"
-      onSubmit={handleSubmit}
-      sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-    >
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 3, 
+            width: '100%', 
+            maxWidth: '100%',
+            p: 1
+          }}
+        >
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
         <Typography sx={{ minWidth: '100px' }}>Enter text</Typography>
-        <TextField
-          variant="outlined"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          required
-          sx={{ 
-            width: '300px',
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': { borderColor: '#9e9e9e' },
-              '& input': { color: 'white' },
-            },
-          }}
-        />
+         <TextField
+                  id="outlined-textarea"
+                  label="Enter text"
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  required
+                  multiline
+                  fullWidth
+                  sx={{ 
+                    minWidth: '100px',
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#9e9e9e' },
+                    },
+                  }}
+                />
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-        <Typography sx={{ minWidth: '100px' }}>Enter key</Typography>
-        <TextField
-          variant="outlined"
-          value={key}
-          onChange={(e) => setKey(e.target.value)}
-          required
-          sx={{ 
-            width: '300px',
-            '& .MuiOutlinedInput-root': {
-              '& fieldset': { borderColor: '#9e9e9e' },
-              '& input': { color: 'white' },
-            },
-          }}
-        />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+         <Typography sx={{ minWidth: '100px' }}>Enter key</Typography>
+         <TextField
+                  id="outlined-textarea"
+                  label="Enter key"
+                  value={key}
+                  onChange={(e) => setKey(e.target.value)}
+                  required
+                  multiline
+                  fullWidth
+                  sx={{ 
+                    minWidth: '100px',
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': { borderColor: '#9e9e9e' },
+                    },
+                  }}
+                />
       </Box>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Typography sx={{ minWidth: '100px' }}>Add file</Typography>
-        <Button variant="contained" component="label" sx={{ width: '300px' }}>
+        <Button 
+          variant="contained" 
+          component="label" 
+          fullWidth
+          sx={{ minWidth: '100px' }}
+        >
           Browse
           <input type="file" hidden onChange={handleFileChange} />
         </Button>
       </Box>
 
-      <Button 
-        variant="contained" 
-        endIcon={<SendIcon />}
-        type="submit"
-        sx={{ width: '420px' }}
-      >
-        Decrypt
-      </Button>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+        <Button 
+          variant="contained" 
+          endIcon={<SendIcon />}
+          type="submit"
+          fullWidth
+          sx={{ minWidth: '100px' }}
+        >
+          Break Encryption
+        </Button>
+        {selectedFile && (
+          <Typography variant="body2">
+            Chosen file: {selectedFile.name}
+          </Typography>
+        )}
+      </Box>
 
-      {selectedFile && (
-        <Typography variant="body2">Chosen file: {selectedFile.name}</Typography>
+      {loading && (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Loader />
+        </Box>
+      )}
+
+      {!loading && result && (
+        <TextField
+          id="result-field"
+          label="Result"
+          aria-label="Result"
+          placeholder="Result will appear here"
+          value={result}
+          multiline
+          readOnly
+          fullWidth
+          sx={{ 
+            mt: 2,
+            minWidth: '100px',
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': { borderColor: '#9e9e9e' },
+              '& textarea': { color: 'white' },
+            },
+          }}
+        />
+      )}
+
+      {!loading && errorLoadingMessage && (
+        <Box sx={{ mt: 2 }}>
+          <Typography color="error">
+            {errorLoadingMessage}
+          </Typography>
+          <Button 
+            variant="outlined" 
+            onClick={reload}
+            sx={{ mt: 1 }}
+          >
+            Retry
+          </Button>
+        </Box>
       )}
     </Box>
   );
