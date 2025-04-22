@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, TextField, Button, Typography } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { respon } from '../services/httpClient';
+import { Loader } from './Loader/Loader';
 
 export default function EncryptForm({ onSubmit }) {
   const [key,setKey] = useState('')
@@ -33,14 +34,19 @@ const handleFileChange = (event) => {
     setErrorLoadingMessage('');
     setResult(null);
     setKey(null)
+    setInputValue('')
 
     respon('/api/encrypt', formPayload)
-    .then((data) => {
-      setResult(data); 
-      setKey(data); 
+    .then(data => {
+      console.log('encrypt response:', data);
+      setResult(data.cipherText);
+      setKey(data.key);
     })
-      .catch(() => setErrorLoadingMessage('Try again later'))
-      .finally(() => setLoading(false));
+    .catch(err => {
+      console.error(err);
+      setErrorLoadingMessage('Try again later');
+    })
+    .finally(() => setLoading(false));
   };
 
   function reload() {
@@ -68,7 +74,6 @@ const handleFileChange = (event) => {
           label="Enter text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          required
           multiline
           fullWidth
           sx={{ 
@@ -174,3 +179,4 @@ const handleFileChange = (event) => {
     </Box>
   );
 }
+

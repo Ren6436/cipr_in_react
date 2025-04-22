@@ -32,6 +32,7 @@ export default function BreakForm({ onSubmit }) {
     setLoading(true);
     setErrorLoadingMessage('');
     setResult(null);
+    setInputValue('');
 
     respon('/api/break', formPayload)
       .then((data) => setResult(data))

@@ -22,6 +22,7 @@ export default function DecryptForm({ onSubmit }) {
   
       const formPayload = {
         text: inputValue,
+        key: key,
         file: selectedFile
       };
   
@@ -33,6 +34,8 @@ export default function DecryptForm({ onSubmit }) {
       setLoading(true);
       setErrorLoadingMessage('');
       setResult(null);
+      setInputValue('');
+      setKey('');
   
       respon('/api/decrypt', formPayload)
         .then((data) => setResult(data))
@@ -170,3 +173,4 @@ export default function DecryptForm({ onSubmit }) {
     </Box>
   );
 }
+

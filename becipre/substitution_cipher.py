@@ -6,9 +6,17 @@ from string import ascii_uppercase
 alphabet = ascii_uppercase + "_"
 
 
-def substitute_encrypt(plaintext, key):
-    mapping = {alphabet[i]: key[i] for i in range(len(alphabet))}
-    return ''.join([mapping.get(c.upper(), c) for c in plaintext])
+def substitute_encrypt(word):
+    abc = list(ascii_uppercase + '_')
+    dict_abc = {char: i for i, char in enumerate(abc, start=1)}
+    index_word = [dict_abc[char] for char in word.upper()]
+
+    number = list(range(1, 28))
+    random.shuffle(number)
+    ciphered_abc = dict(zip(number, abc))
+    key = ''.join([ciphered_abc[i] for i in range(1, 28)])
+    cipr_words = [ciphered_abc[num] for num in index_word]
+    return (''.join(cipr_words), key)
 
 
 def substitute_decrypt(ciphertext, key):
